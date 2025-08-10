@@ -1,10 +1,21 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { Compass, MapPin, User2, ShoppingCart, LogOut } from "lucide-react";
+import { useUser } from "../store/UserContext";
+import { useAuth } from "../store/AuthContext";
 
 export default function Navbar() {
   const navigate = useNavigate();
   const active = "text-gray-900 font-medium";
   const base = "text-gray-600 hover:text-gray-900";
+
+  const { user, clearUser } = useUser();
+  const { logout } = useAuth?.() || { logout: () => {} };
+
+  const onLogout = () => {
+    try { logout?.(); } catch {}
+    try { clearUser(); } catch {}
+    navigate("/login");
+  };
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-gray-200">
@@ -13,7 +24,9 @@ export default function Navbar() {
           <div className="w-8 h-8 rounded-full bg-brand-600 grid place-content-center text-white">
             <Compass size={18} />
           </div>
-          <span className="font-semibold tracking-wide">Wanderlust</span>
+          <span className="font-semibold tracking-wide">
+            {user?.fullName ? `Wanderlust — ${user.fullName}` : "Wanderlust"}
+          </span>
         </Link>
 
         <div className="hidden md:flex flex-1 max-w-xl">
@@ -39,7 +52,7 @@ export default function Navbar() {
               <ShoppingCart size={18}/> Cart
             </span>
           </NavLink>
-          <button onClick={()=>navigate("/login")} className="text-gray-600 hover:text-gray-900 inline-flex items-center gap-2">
+          <button onClick={onLogout} className="text-gray-600 hover:text-gray-900 inline-flex items-center gap-2">
             <LogOut size={18}/> Logout
           </button>
         </nav>

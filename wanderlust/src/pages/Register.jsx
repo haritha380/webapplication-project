@@ -1,9 +1,47 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useUser } from "../store/UserContext";
 
 const BG =
   "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1600&auto=format&fit=crop";
 
 export default function Register() {
+  const navigate = useNavigate();
+  const { saveUser } = useUser();
+
+  const onSubmit = (e) => {
+    e.preventDefault();
+    const form = new FormData(e.currentTarget);
+    const fullName = form.get("fullName")?.toString().trim();
+    const email = form.get("email")?.toString().trim();
+    const password = form.get("password")?.toString();
+    const confirm = form.get("confirm")?.toString();
+
+    if (!fullName || !email || !password) {
+      alert("Please fill all required fields.");
+      return;
+    }
+    if (password !== confirm) {
+      alert("Passwords do not match.");
+      return;
+    }
+
+    // Minimal profile — extend as you like
+    const newUser = {
+      fullName,
+      email,
+      age: "",
+      location: "Colombo, Sri Lanka",
+      language: "English",
+      photo: "",
+      createdAt: new Date().toISOString(),
+    };
+
+    saveUser(newUser);
+    // Optional: also log in here if your AuthContext requires it
+    // navigate to profile so they see their data
+    navigate("/profile");
+  };
+
   return (
     <div className="grid md:grid-cols-2 min-h-[680px]">
       <div
@@ -29,26 +67,26 @@ export default function Register() {
           <h2 className="text-5xl font-serif font-bold">Create Account</h2>
           <p className="mt-2 text-xl">Begin your journey with us</p>
 
-          <form className="mt-10 space-y-6">
+          <form onSubmit={onSubmit} className="mt-10 space-y-6">
             <div>
               <label className="block mb-2">Full Name</label>
-              <input className="input !bg-gray-800 !border-gray-700 text-white" placeholder="John Doe" />
+              <input name="fullName" className="input !bg-gray-800 !border-gray-700 text-white" placeholder="John Doe" required />
             </div>
             <div>
               <label className="block mb-2">Email</label>
-              <input className="input !bg-gray-800 !border-gray-700 text-white" type="email" placeholder="you@example.com" />
+              <input name="email" className="input !bg-gray-800 !border-gray-700 text-white" type="email" placeholder="you@example.com" required />
             </div>
             <div>
               <label className="block mb-2">Password</label>
-              <input className="input !bg-gray-800 !border-gray-700 text-white" type="password" placeholder="••••••••" />
+              <input name="password" className="input !bg-gray-800 !border-gray-700 text-white" type="password" placeholder="••••••••" required />
             </div>
             <div>
               <label className="block mb-2">Confirm Password</label>
-              <input className="input !bg-gray-800 !border-gray-700 text-white" type="password" placeholder="••••••••" />
+              <input name="confirm" className="input !bg-gray-800 !border-gray-700 text-white" type="password" placeholder="••••••••" required />
             </div>
 
             <label className="flex items-center gap-3">
-              <input type="checkbox" className="w-5 h-5" />
+              <input type="checkbox" className="w-5 h-5" required />
               <span>I agree to the Terms of Service and Privacy Policy</span>
             </label>
 
@@ -65,3 +103,4 @@ export default function Register() {
     </div>
   );
 }
+
