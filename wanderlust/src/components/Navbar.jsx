@@ -2,6 +2,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { Compass, MapPin, User2, ShoppingCart, LogOut } from "lucide-react";
 import { useUser } from "../store/UserContext";
 import { useAuth } from "../store/AuthContext";
+import { useState } from "react";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -11,10 +12,28 @@ export default function Navbar() {
   const { user, clearUser } = useUser();
   const { logout } = useAuth?.() || { logout: () => {} };
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [error, setError] = useState("");
+
   const onLogout = () => {
     try { logout?.(); } catch {}
     try { clearUser(); } catch {}
     navigate("/login");
+  };
+
+  const handleSearch = (e) => {
+    if (e.key === "Enter") {
+      const query = searchQuery.trim().toLowerCase();
+      if (query === "kandy") {
+        navigate("/districts/kandy");
+        setError("");
+      } else if (query === "colombo") {
+        navigate("/districts/colombo");
+        setError("");
+      } else {
+        setError("Not available for now, try later.");
+      }
+    }
   };
 
   return (
@@ -29,25 +48,33 @@ export default function Navbar() {
           </span>
         </Link>
 
-        <div className="hidden md:flex flex-1 max-w-xl">
+        <div className="hidden md:flex flex-1 max-w-xl relative">
           <input
             className="w-full rounded-full bg-gray-100 px-4 py-2 outline-none border border-transparent focus:border-brand-400"
             placeholder="Search destinations, activities, or guides…"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={handleSearch}
           />
+          {error && (
+            <div className="absolute top-full left-0 mt-1 text-red-500 text-sm">
+              {error}
+            </div>
+          )}
         </div>
 
         <nav className="flex items-center gap-5">
-          <NavLink to="/districts" className={({isActive})=>isActive?active:base}>
+          <NavLink to="/districts" className={({ isActive }) => isActive ? active : base}>
             <span className="inline-flex items-center gap-2">
               <MapPin size={18}/> Select District
             </span>
           </NavLink>
-          <NavLink to="/profile" className={({isActive})=>isActive?active:base}>
+          <NavLink to="/profile" className={({ isActive }) => isActive ? active : base}>
             <span className="inline-flex items-center gap-2">
               <User2 size={18}/> Profile
             </span>
           </NavLink>
-          <NavLink to="/cart" className={({isActive})=>isActive?active:base}>
+          <NavLink to="/cart" className={({ isActive }) => isActive ? active : base}>
             <span className="inline-flex items-center gap-2">
               <ShoppingCart size={18}/> Cart
             </span>
