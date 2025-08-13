@@ -3,6 +3,9 @@ import KAN1_IMAGE from "../assets/kandy1.webp";
 import TOOTH_IMAGE from "../assets/tooth.jpg";
 import PERA_IMAGE from "../assets/pera.webp";
 import BAHIR_IMAGE from "../assets/bahirawa.jpg";
+
+import {Link} from 'react-router-dom'
+
 const HERO =
 KAN1_IMAGE
 const T1 =
@@ -90,7 +93,7 @@ export default function District() {
                         Book Cab
                       </button>
                     ) : c.to ? (
-                      <a href={c.to} className="btn-dark">Book Cab</a>
+                      <Link to={c.to} className="btn-dark">Book Cab</Link>
                     ) : (
                       <button className="btn-dark">Book Cab</button>
                     )}

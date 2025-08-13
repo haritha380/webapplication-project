@@ -3,8 +3,11 @@ import { useAuth } from "../store/AuthContext.jsx";
 
 export default function ProtectedRoute({ children }) {
   const { isLoggedIn } = useAuth();
+ 
+  
 
   if (!isLoggedIn) {
+ 
     return <Navigate to="/login" replace />;
   }
 

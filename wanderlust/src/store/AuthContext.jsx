@@ -9,6 +9,7 @@ export function AuthProvider({ children }) {
   // Load from localStorage on refresh
   useEffect(() => {
     const storedLogin = localStorage.getItem("isLoggedIn") === "true";
+    
     setIsLoggedIn(storedLogin);
   }, []);
 

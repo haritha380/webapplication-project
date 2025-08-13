@@ -5,6 +5,8 @@ import HERO_COLOMBO from "../assets/colomboview.jpg";
 import IMG_LOTUS from "../assets/lotus.jpeg";
 import IMG_PORT from "../assets/portcity.jpg";
 import IMG_VIHARA from "../assets/vihara.jpg";
+import { Link } from 'react-router-dom';
+
 
 /* If you don't have local files yet, comment out the imports above and use URLs:
 const HERO_COLOMBO = "https://images.unsplash.com/photo-1541791845191-bfd3bfff4783?w=1600&q=80&auto=format&fit=crop";
@@ -95,7 +97,7 @@ export default function Colombo() {
     Book Cab
   </button>
 ) : c.to ? (
-  <a href={c.to} className="btn-dark">Book Cab</a>
+  <Link to={c.to} className="btn-dark">Book Cab</Link>
 ) : (
   <button className="btn-dark">Book Cab</button>
 )}
