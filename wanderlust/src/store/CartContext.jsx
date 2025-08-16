@@ -1,7 +1,16 @@
+// src/store/CartContext.jsx
 import { createContext, useContext, useMemo, useEffect, useState } from "react";
 import { api } from "../lib/api";
 
 const CartContext = createContext();
+
+// helper: accept either {items:[...]} or [...] and ensure each item has .id
+function normalizeCart(res) {
+  const arr = (res?.items ?? res ?? []);
+  return Array.isArray(arr)
+    ? arr.map((c) => ({ ...c, id: c.id || c.placeId })) // ensure .id exists
+    : [];
+}
 
 export const CartProvider = ({ children }) => {
   const [items, setItems] = useState([]);
@@ -10,29 +19,30 @@ export const CartProvider = ({ children }) => {
     const token = localStorage.getItem("token");
     if (!token) return;
     api("/cart")
-      .then((data) => setItems(data?.items || []))
+      .then((data) => setItems(normalizeCart(data)))
       .catch(() => setItems([]));
   }, []);
 
   const add = async (item) => {
+    // backend POST /cart accepts { id, title, distance, fee, img }
     const data = await api("/cart", { method: "POST", body: item });
-    setItems(data?.items || []);
+    setItems(normalizeCart(data));
   };
 
-  const remove = async (id) => {
-    const data = await api(`/cart/${encodeURIComponent(id)}`, { method: "DELETE" });
-    setItems(data?.items || []);
+  const remove = async (idOrPlaceId) => {
+    const pid = encodeURIComponent(idOrPlaceId);
+    const data = await api(`/cart/${pid}`, { method: "DELETE" });
+    setItems(normalizeCart(data));
   };
 
   const clear = async () => {
     const data = await api("/cart", { method: "DELETE" });
-    setItems(data?.items || []);
+    setItems(normalizeCart(data));
   };
 
   const book = async (item) => {
-    // records “User Booked a Cab”
     await api("/bookings", { method: "POST", body: item });
-    // (optional) you could also clear from cart or show a toast
+    // optional: await clear(); or remove(item.id);
   };
 
   const value = useMemo(() => ({ items, add, remove, clear, book }), [items]);

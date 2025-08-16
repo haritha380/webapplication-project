@@ -33,35 +33,47 @@ export default function Cart() {
             </div>
           ) : (
             <div className="grid md:grid-cols-2 gap-8">
-              {items.map((i) => (
-                <div key={i.id} className="flex gap-4">
-                  <img
-                    src={i.img}
-                    alt={i.title}
-                    className="w-72 h-44 object-cover rounded-lg"
-                  />
-                  <div className="bg-[#c6ffee] rounded-2xl p-5 w-full">
-                    <div className="font-serif text-2xl font-bold mb-2">
-                      {i.title}
-                    </div>
-                    <div className="text-sm">Distance : {i.distance}</div>
-                    <div className="text-sm">Transport fee : {i.fee}</div>
+              {items.map((i) => {
+                const pid = i.id || i.placeId; // safe id for both shapes
+                return (
+                  <div key={pid} className="flex gap-4">
+                    {i.img ? (
+                      <img
+                        src={i.img}
+                        alt={i.title}
+                        className="w-72 h-44 object-cover rounded-lg"
+                      />
+                    ) : (
+                      <div className="w-72 h-44 rounded-lg bg-gray-200 grid place-content-center text-gray-500">
+                        No image
+                      </div>
+                    )}
+                    <div className="bg-[#c6ffee] rounded-2xl p-5 w-full">
+                      <div className="font-serif text-2xl font-bold mb-2">
+                        {i.title}
+                      </div>
+                      {i.distance && (
+                        <div className="text-sm">Distance : {i.distance}</div>
+                      )}
+                      {i.fee && (
+                        <div className="text-sm">Transport fee : {i.fee}</div>
+                      )}
 
-                    <div className="mt-5 flex items-center gap-4">
-                      {/* Updated button to call book(i) */}
-                      <button onClick={() => book(i)} className="btn-dark">
-                        Book Taxi
-                      </button>
-                      <button
-                        onClick={() => remove(i.id)}
-                        className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800"
-                      >
-                        Delete
-                      </button>
+                      <div className="mt-5 flex items-center gap-4">
+                        <button onClick={() => book(i)} className="btn-dark">
+                          Book Taxi
+                        </button>
+                        <button
+                          onClick={() => remove(pid)}
+                          className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800"
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
 
