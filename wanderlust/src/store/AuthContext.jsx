@@ -1,30 +1,45 @@
-import { createContext, useContext, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { createContext, useContext, useEffect, useState } from "react";
+import { api } from "../lib/api";
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // Load from localStorage on refresh
   useEffect(() => {
-    const storedLogin = localStorage.getItem("isLoggedIn") === "true";
-    
-    setIsLoggedIn(storedLogin);
+    setIsLoggedIn(!!localStorage.getItem("token"));
   }, []);
 
-  const login = () => {
-    setIsLoggedIn(true);
-    localStorage.setItem("isLoggedIn", "true");
-  };
+  async function register({ fullName, email, password }) {
+    const data = await api("/auth/register", {
+      method: "POST",
+      auth: false,
+      body: { fullName, email, password },
+    });
+    if (data?.token) {
+      localStorage.setItem("token", data.token);
+      setIsLoggedIn(true);
+    }
+    return data;
+  }
 
-  const logout = () => {
+  async function login({ email, password }) {
+    const { token } = await api("/auth/login", {
+      method: "POST",
+      auth: false,
+      body: { email, password },
+    });
+    localStorage.setItem("token", token);
+    setIsLoggedIn(true);
+  }
+
+  function logout() {
+    localStorage.removeItem("token");
     setIsLoggedIn(false);
-    localStorage.removeItem("isLoggedIn");
-  };
+  }
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, login, logout, register }}>
       {children}
     </AuthContext.Provider>
   );

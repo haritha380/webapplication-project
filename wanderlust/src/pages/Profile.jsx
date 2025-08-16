@@ -7,7 +7,7 @@ const BG =
   "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1600&auto=format&fit=crop";
 
 export default function Profile() {
-  const { user, updateUser } = useUser();
+  
   const [fullName, setFullName] = useState("");
   const [age, setAge] = useState("");
   const [email, setEmail] = useState("");
@@ -15,6 +15,7 @@ export default function Profile() {
   const [language, setLanguage] = useState("English");
   const [photo, setPhoto] = useState("");
   const fileRef = useRef(null);
+  const { user, updateUser, deleteAccount } = useUser();
 
   useEffect(() => {
     if (user) {
@@ -166,6 +167,7 @@ export default function Profile() {
                 <div className="flex items-center gap-3">
                   <button type="submit" className="btn-primary">Update</button>
                   <button type="button" className="btn-ghost !bg-white/10 !text-white">Delete</button>
+                  <button type="button" onClick={deleteAccount} className="btn-ghost !bg-white/10 !text-white">Delete</button>
                 </div>
               </div>
             </div>

@@ -1,41 +1,47 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { api } from "../lib/api";
 
 const UserContext = createContext();
-const STORAGE_KEY = "wanderlust_user";
 
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
 
-  // Load from localStorage on first mount
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setUser(JSON.parse(raw));
-    } catch {
-      // ignore parse errors
-    }
+    const token = localStorage.getItem("token");
+    if (!token) return;
+    api("/me")
+      .then((u) => setUser(u))
+      .catch(() => setUser(null));
   }, []);
 
-  const saveUser = (next) => {
-    setUser(next);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-  };
+  async function refresh() {
+    const me = await api("/me");
+    setUser(me);
+  }
 
-  const updateUser = (partial) => {
-    setUser((prev) => {
-      const next = { ...(prev || {}), ...partial };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-      return next;
-    });
-  };
+  async function saveUser(partial) {
+    const updated = await api("/me", { method: "PUT", body: partial });
+    setUser(updated);
+  }
 
-  const clearUser = () => {
+  async function updateUser(partial) {
+    const updated = await api("/me", { method: "PUT", body: partial });
+    setUser(updated);
+  }
+
+  async function deleteAccount() {
+    await api("/me", { method: "DELETE" });
     setUser(null);
-    localStorage.removeItem(STORAGE_KEY);
-  };
+    localStorage.removeItem("token");
+  }
+
+  function clearUser() {
+    setUser(null);
+    localStorage.removeItem("token");
+  }
 
   return (
-    <UserContext.Provider value={{ user, saveUser, updateUser, clearUser }}>
+    <UserContext.Provider value={{ user, saveUser, updateUser, deleteAccount, clearUser, refresh }}>
       {children}
     </UserContext.Provider>
   );
@@ -44,4 +50,3 @@ export function UserProvider({ children }) {
 export function useUser() {
   return useContext(UserContext);
 }
-

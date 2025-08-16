@@ -1,10 +1,11 @@
+// src/pages/Cart.jsx
 import { useCart } from "../store/CartContext.jsx";
 
 const BG =
   "https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=1600&auto=format&fit=crop";
 
 export default function Cart() {
-  const { items, remove, clear } = useCart();
+  const { items, remove, clear, book } = useCart();
 
   return (
     <>
@@ -17,7 +18,11 @@ export default function Cart() {
 
       <section
         className="relative min-h-[420px]"
-        style={{ backgroundImage: `url(${BG})`, backgroundSize: "cover", backgroundPosition: "center" }}
+        style={{
+          backgroundImage: `url(${BG})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
       >
         <div className="absolute inset-0 bg-black/50" />
 
@@ -30,15 +35,29 @@ export default function Cart() {
             <div className="grid md:grid-cols-2 gap-8">
               {items.map((i) => (
                 <div key={i.id} className="flex gap-4">
-                  <img src={i.img} alt={i.title} className="w-72 h-44 object-cover rounded-lg" />
+                  <img
+                    src={i.img}
+                    alt={i.title}
+                    className="w-72 h-44 object-cover rounded-lg"
+                  />
                   <div className="bg-[#c6ffee] rounded-2xl p-5 w-full">
-                    <div className="font-serif text-2xl font-bold mb-2">{i.title}</div>
+                    <div className="font-serif text-2xl font-bold mb-2">
+                      {i.title}
+                    </div>
                     <div className="text-sm">Distance : {i.distance}</div>
                     <div className="text-sm">Transport fee : {i.fee}</div>
 
                     <div className="mt-5 flex items-center gap-4">
-                      <button className="btn-dark">Book Taxi</button>
-                      <button onClick={() => remove(i.id)} className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800">Delete</button>
+                      {/* Updated button to call book(i) */}
+                      <button onClick={() => book(i)} className="btn-dark">
+                        Book Taxi
+                      </button>
+                      <button
+                        onClick={() => remove(i.id)}
+                        className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800"
+                      >
+                        Delete
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -48,7 +67,12 @@ export default function Cart() {
 
           {items.length > 0 && (
             <div className="mt-8">
-              <button onClick={clear} className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800">Clear All</button>
+              <button
+                onClick={clear}
+                className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800"
+              >
+                Clear All
+              </button>
             </div>
           )}
         </div>

@@ -1,14 +1,15 @@
+// src/pages/Register.jsx
 import { Link, useNavigate } from "react-router-dom";
-import { useUser } from "../store/UserContext";
+import { useAuth } from "../store/AuthContext.jsx";
 
 const BG =
   "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1600&auto=format&fit=crop";
 
 export default function Register() {
   const navigate = useNavigate();
-  const { saveUser } = useUser();
+  const { register } = useAuth();
 
-  const onSubmit = (e) => {
+  async function onSubmit(e) {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
     const fullName = form.get("fullName")?.toString().trim();
@@ -16,31 +17,17 @@ export default function Register() {
     const password = form.get("password")?.toString();
     const confirm = form.get("confirm")?.toString();
 
-    if (!fullName || !email || !password) {
-      alert("Please fill all required fields.");
-      return;
-    }
-    if (password !== confirm) {
-      alert("Passwords do not match.");
-      return;
-    }
+    if (!fullName || !email || !password) return alert("Please fill all required fields.");
+    if (password !== confirm) return alert("Passwords do not match.");
 
-    // Minimal profile — extend as you like
-    const newUser = {
-      fullName,
-      email,
-      age: "",
-      location: "Colombo, Sri Lanka",
-      language: "English",
-      photo: "",
-      createdAt: new Date().toISOString(),
-    };
-
-    saveUser(newUser);
-    // Optional: also log in here if your AuthContext requires it
-    // navigate to profile so they see their data
-    navigate("/profile");
-  };
+    try {
+      // calls backend: POST /api/auth/register
+      await register({ fullName, email, password });
+      navigate("/profile");
+    } catch (err) {
+      alert(err.message);
+    }
+  }
 
   return (
     <div className="grid md:grid-cols-2 min-h-[680px]">
@@ -70,19 +57,42 @@ export default function Register() {
           <form onSubmit={onSubmit} className="mt-10 space-y-6">
             <div>
               <label className="block mb-2">Full Name</label>
-              <input name="fullName" className="input !bg-gray-800 !border-gray-700 text-white" placeholder="John Doe" required />
+              <input
+                name="fullName"
+                className="input !bg-gray-800 !border-gray-700 text-white"
+                placeholder="John Doe"
+                required
+              />
             </div>
             <div>
               <label className="block mb-2">Email</label>
-              <input name="email" className="input !bg-gray-800 !border-gray-700 text-white" type="email" placeholder="you@example.com" required />
+              <input
+                name="email"
+                className="input !bg-gray-800 !border-gray-700 text-white"
+                type="email"
+                placeholder="you@example.com"
+                required
+              />
             </div>
             <div>
               <label className="block mb-2">Password</label>
-              <input name="password" className="input !bg-gray-800 !border-gray-700 text-white" type="password" placeholder="••••••••" required />
+              <input
+                name="password"
+                className="input !bg-gray-800 !border-gray-700 text-white"
+                type="password"
+                placeholder="••••••••"
+                required
+              />
             </div>
             <div>
               <label className="block mb-2">Confirm Password</label>
-              <input name="confirm" className="input !bg-gray-800 !border-gray-700 text-white" type="password" placeholder="••••••••" required />
+              <input
+                name="confirm"
+                className="input !bg-gray-800 !border-gray-700 text-white"
+                type="password"
+                placeholder="••••••••"
+                required
+              />
             </div>
 
             <label className="flex items-center gap-3">
@@ -103,4 +113,3 @@ export default function Register() {
     </div>
   );
 }
-

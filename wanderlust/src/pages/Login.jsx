@@ -1,18 +1,25 @@
 // src/pages/Login.jsx
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../store/AuthContext.jsx";
-import { useNavigate } from "react-router-dom";
 import FALL_IMAGE from "../assets/fall.jpg";
 
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  async function handleLogin(e) {
     e.preventDefault();
-    login(); // call your AuthContext login function
-    navigate("/"); // redirect to homepage
-  };
+    const form = new FormData(e.currentTarget);
+    const email = form.get("email")?.toString();
+    const password = form.get("password")?.toString();
+
+    try {
+      await login({ email, password }); // calls backend /api/auth/login
+      navigate("/"); // success -> go home
+    } catch (err) {
+      alert(err.message);
+    }
+  }
 
   return (
     <div className="grid md:grid-cols-2 min-h-[640px]">
@@ -54,6 +61,7 @@ export default function Login() {
               <label className="block font-medium mb-2">Email</label>
               <input
                 className="input"
+                name="email"                // <-- IMPORTANT
                 type="email"
                 placeholder="you@example.com"
                 required
@@ -63,6 +71,7 @@ export default function Login() {
               <label className="block font-medium mb-2">Password</label>
               <input
                 className="input"
+                name="password"             // <-- IMPORTANT
                 type="password"
                 placeholder="••••••••"
                 required
