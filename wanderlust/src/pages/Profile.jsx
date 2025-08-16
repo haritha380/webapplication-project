@@ -166,7 +166,7 @@ export default function Profile() {
                 </div>
                 <div className="flex items-center gap-3">
                   <button type="submit" className="btn-primary">Update</button>
-                  <button type="button" className="btn-ghost !bg-white/10 !text-white">Delete</button>
+                 
                   <button type="button" onClick={deleteAccount} className="btn-ghost !bg-white/10 !text-white">Delete</button>
                 </div>
               </div>
