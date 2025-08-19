@@ -65,8 +65,8 @@ export default function Profile() {
   return (
     <>
       <section className="relative h-28 bg-[#1f1a17] text-white flex items-center justify-center">
-        <div className="container-xxl text-center">
-          <h1 className="h-hero text-4xl">Profile</h1>
+        <div className="text-center container-xxl">
+          <h1 className="text-4xl h-hero">Profile</h1>
         </div>
       </section>
 
@@ -80,14 +80,14 @@ export default function Profile() {
       >
         <div className="absolute inset-0 bg-black/55" />
 
-        <div className="relative container-xxl py-10 grid lg:grid-cols-3 gap-10 text-gray-100">
+        <div className="relative grid gap-10 py-10 text-gray-100 container-xxl lg:grid-cols-3">
           {/* Left */}
           <div className="lg:col-span-1">
-            <div className="bg-black/70 rounded-2xl p-6">
-              <div className="w-40 h-40 rounded-full overflow-hidden mx-auto ring-2 ring-white/30">
+            <div className="p-6 bg-black/70 rounded-2xl">
+              <div className="w-40 h-40 mx-auto overflow-hidden rounded-full ring-2 ring-white/30">
                 <img
                   src={profileSrc}
-                  className="w-full h-full object-cover"
+                  className="object-cover w-full h-full"
                   alt="profile"
                 />
               </div>
@@ -104,16 +104,16 @@ export default function Profile() {
               >
                 Change Photo
               </button>
-              <p className="text-xs text-center mt-2">
+              <p className="mt-2 text-xs text-center">
                 Recommended size: 400×400px
               </p>
             </div>
           </div>
 
           {/* Right */}
-          <form onSubmit={handleSave} className="lg:col-span-2 space-y-8">
-            <div className="bg-black/70 rounded-2xl p-6">
-              <h3 className="text-xl font-semibold mb-4">Profile Information</h3>
+          <form onSubmit={handleSave} className="space-y-8 lg:col-span-2">
+            <div className="p-6 bg-black/70 rounded-2xl">
+              <h3 className="mb-4 text-xl font-semibold">Profile Information</h3>
               <div className="grid gap-4">
                 <div>
                   <label className="block mb-1">Full Name</label>
@@ -133,7 +133,7 @@ export default function Profile() {
                     value={age}
                     onChange={(e) => setAge(e.target.value)}
                   />
-                  <p className="text-xs mt-1 opacity-70">Must be 18 or older</p>
+                  <p className="mt-1 text-xs opacity-70">Must be 18 or older</p>
                 </div>
                 <div>
                   <label className="block mb-1">Email Address</label>
@@ -145,16 +145,16 @@ export default function Profile() {
                     type="email"
                     required
                   />
-                  <p className="text-xs mt-1 opacity-70">
+                  <p className="mt-1 text-xs opacity-70">
                     Used for account recovery
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="bg-black/70 rounded-2xl p-6">
-                <h3 className="text-xl font-semibold mb-3">
+            <div className="grid gap-6 md:grid-cols-2">
+              <div className="p-6 bg-black/70 rounded-2xl">
+                <h3 className="mb-3 text-xl font-semibold">
                   Travel Preferences
                 </h3>
                 <input
@@ -164,8 +164,8 @@ export default function Profile() {
                   placeholder="City, Country"
                 />
               </div>
-              <div className="bg-black/70 rounded-2xl p-6">
-                <h3 className="text-xl font-semibold mb-3">Language</h3>
+              <div className="p-6 bg-black/70 rounded-2xl">
+                <h3 className="mb-3 text-xl font-semibold">Language</h3>
                 <input
                   className="input !bg-white/10 !border-white/10 text-white"
                   value={language}
@@ -175,18 +175,18 @@ export default function Profile() {
               </div>
             </div>
 
-            <div className="bg-black/70 rounded-2xl p-6">
-              <h3 className="text-xl font-semibold mb-3">Privacy Settings</h3>
+            <div className="p-6 bg-black/70 rounded-2xl">
+              <h3 className="mb-3 text-xl font-semibold">Privacy Settings</h3>
               <label className="inline-flex items-center gap-3">
                 <input type="checkbox" defaultChecked className="w-5 h-5" />
                 <span>Private Profile</span>
               </label>
             </div>
 
-            <div className="bg-black/70 rounded-2xl p-6">
+            <div className="p-6 bg-black/70 rounded-2xl">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-red-400 font-semibold">Delete Account</div>
+                  <div className="font-semibold text-red-400">Delete Account</div>
                   <div className="text-xs opacity-70">
                     Permanently delete your account
                   </div>
