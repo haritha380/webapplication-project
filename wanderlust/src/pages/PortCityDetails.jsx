@@ -81,7 +81,9 @@ export default function PortCityDetails() {
                 Add cart
               </button>
               {/* Use your taxi button style; if you created .btn-taxi it will apply, else replace with btn-ghost or custom classes */}
-              <button className="btn-taxi">Book Taxi</button>
+              <button onClick={() => book(i)} className="btn-dark">
+                          Book Taxi
+                        </button>
             </div>
           </div>
         </div>

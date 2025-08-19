@@ -1,5 +1,6 @@
 import { useUser } from "../store/UserContext";
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const DEFAULT_PROFILE =
   "https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?q=80&w=600&auto=format&fit=crop";
@@ -7,7 +8,6 @@ const BG =
   "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1600&auto=format&fit=crop";
 
 export default function Profile() {
-  
   const [fullName, setFullName] = useState("");
   const [age, setAge] = useState("");
   const [email, setEmail] = useState("");
@@ -15,7 +15,9 @@ export default function Profile() {
   const [language, setLanguage] = useState("English");
   const [photo, setPhoto] = useState("");
   const fileRef = useRef(null);
+
   const { user, updateUser, deleteAccount } = useUser();
+  const navigate = useNavigate(); // ✅ for redirecting
 
   useEffect(() => {
     if (user) {
@@ -52,6 +54,12 @@ export default function Profile() {
     reader.readAsDataURL(f);
   };
 
+  // ✅ handle delete and redirect
+  const handleDelete = () => {
+    deleteAccount();
+    navigate("/login", { replace: true });
+  };
+
   const profileSrc = photo || DEFAULT_PROFILE;
 
   return (
@@ -64,7 +72,11 @@ export default function Profile() {
 
       <section
         className="relative"
-        style={{ backgroundImage: `url(${BG})`, backgroundSize: "cover", backgroundPosition: "center" }}
+        style={{
+          backgroundImage: `url(${BG})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
       >
         <div className="absolute inset-0 bg-black/55" />
 
@@ -73,7 +85,11 @@ export default function Profile() {
           <div className="lg:col-span-1">
             <div className="bg-black/70 rounded-2xl p-6">
               <div className="w-40 h-40 rounded-full overflow-hidden mx-auto ring-2 ring-white/30">
-                <img src={profileSrc} className="w-full h-full object-cover" alt="profile" />
+                <img
+                  src={profileSrc}
+                  className="w-full h-full object-cover"
+                  alt="profile"
+                />
               </div>
               <input
                 ref={fileRef}
@@ -82,10 +98,15 @@ export default function Profile() {
                 accept="image/*"
                 onChange={onFileChange}
               />
-              <button onClick={onPickPhoto} className="btn-ghost w-full mt-4 !bg-white/10 !text-white">
+              <button
+                onClick={onPickPhoto}
+                className="btn-ghost w-full mt-4 !bg-white/10 !text-white"
+              >
                 Change Photo
               </button>
-              <p className="text-xs text-center mt-2">Recommended size: 400×400px</p>
+              <p className="text-xs text-center mt-2">
+                Recommended size: 400×400px
+              </p>
             </div>
           </div>
 
@@ -124,14 +145,18 @@ export default function Profile() {
                     type="email"
                     required
                   />
-                  <p className="text-xs mt-1 opacity-70">Used for account recovery</p>
+                  <p className="text-xs mt-1 opacity-70">
+                    Used for account recovery
+                  </p>
                 </div>
               </div>
             </div>
 
             <div className="grid md:grid-cols-2 gap-6">
               <div className="bg-black/70 rounded-2xl p-6">
-                <h3 className="text-xl font-semibold mb-3">Travel Preferences</h3>
+                <h3 className="text-xl font-semibold mb-3">
+                  Travel Preferences
+                </h3>
                 <input
                   className="input !bg-white/10 !border-white/10 text-white"
                   value={location}
@@ -162,12 +187,22 @@ export default function Profile() {
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-red-400 font-semibold">Delete Account</div>
-                  <div className="text-xs opacity-70">Permanently delete your account</div>
+                  <div className="text-xs opacity-70">
+                    Permanently delete your account
+                  </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <button type="submit" className="btn-primary">Update</button>
-                 
-                  <button type="button" onClick={deleteAccount} className="btn-ghost !bg-white/10 !text-white">Delete</button>
+                  <button type="submit" className="btn-primary">
+                    Update
+                  </button>
+                  {/* ✅ updated delete button */}
+                  <button
+                    type="button"
+                    onClick={handleDelete}
+                    className="btn-ghost !bg-white/10 !text-white"
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
             </div>
