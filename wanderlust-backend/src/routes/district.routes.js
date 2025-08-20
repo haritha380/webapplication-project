@@ -7,8 +7,8 @@ const router = Router();
 
 // Create a district
 router.post("/", requireAuth, async (req, res) => {
-  const { name } = req.body;
-  const district = new District({ name });
+  const { name, description, image } = req.body;
+  const district = new District({ name,  description, image });
   await district.save();
   res.status(201).json(district);
 });
@@ -22,7 +22,22 @@ router.get("/", requireAuth, async (req, res) => {
 router.get("/:districtId", async (req, res) => {
   const { districtId } = req.params;
   const district = await District.findById(districtId);
-  res.json(district)
+  res.json(district);
+});
+
+// Update a district
+router.patch("/:districtId", requireAuth, async (req, res) => {
+  const { districtId } = req.params;
+  const updates = req.body;
+  const district = await District.findByIdAndUpdate(districtId, updates, { new: true });
+  res.json(district);
+});
+
+// Delete a district
+router.delete("/:districtId", requireAuth, async (req, res) => {
+  const { districtId } = req.params;
+  await District.findByIdAndDelete(districtId);
+  res.status(204).send();
 });
 
 export default router;

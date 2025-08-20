@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { api } from "../lib/api"; // Use the api function to interact with backend
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import KANDY_IMG from "../assets/kandy1.webp";
 import COLOMBO_IMG from "../assets/colomboview.jpg";
 import GALLE_IMG from "../assets/galle.webp";
@@ -13,13 +13,13 @@ export default function AdminDashboard() {
   const [districts, setDistricts] = useState([]);
   const [newDistrict, setNewDistrict] = useState("");
   const [newDistrictDescription, setNewDistrictDescription] = useState(""); // New state for district description
-  const [newDistrictPhotoUrl, setNewDistrictPhotoUrl] = useState(""); // New state for district photo URL
+  const [newDistrictimage, setNewDistrictimage] = useState(""); // New state for district photo URL
   const [newPlace, setNewPlace] = useState({ district: "", name: "", description: "" });
-  const [newPlacePhotoUrl, setNewPlacePhotoUrl] = useState(""); // New state for place photo URL
+  const [newPlaceimage, setNewPlaceimage] = useState(""); // New state for place photo URL
   const [editingDistrictId, setEditingDistrictId] = useState(null);
-  const [editingData, setEditingData] = useState({ name: "", blurb: "", photoUrl: "" });
+  const [editingData, setEditingData] = useState({ name: "", description: "", image: "" });
   const [editingPlaceId, setEditingPlaceId] = useState(null); // New state for editing places
-  const [editingPlaceData, setEditingPlaceData] = useState({ name: "", description: "", photoUrl: "" }); // New state for place editing
+  const [editingPlaceData, setEditingPlaceData] = useState({ name: "", description: "", image: "" }); // New state for place editing
 
   const images = {
     Kandy: KANDY_IMG,
@@ -30,6 +30,7 @@ export default function AdminDashboard() {
     Anuradhapura: ANURADHAPURA_IMG
   };
 
+  const navigete = useNavigate()
   // Fetch districts from the backend
   useEffect(() => {
     async function fetchDistricts() {
@@ -46,14 +47,14 @@ export default function AdminDashboard() {
         method: "POST", 
         body: { 
           name: newDistrict, 
-          blurb: newDistrictDescription,
-          photoUrl: newDistrictPhotoUrl
+          description: newDistrictDescription,
+          image: newDistrictimage
         } 
       });
       setDistricts((prev) => [...prev, data]);
       setNewDistrict("");
       setNewDistrictDescription("");
-      setNewDistrictPhotoUrl("");
+      setNewDistrictimage("");
     } catch (err) {
       console.error(err);
     }
@@ -65,7 +66,7 @@ export default function AdminDashboard() {
       const {description, district, name} = newPlace;
       const placeData = {
         ...newPlace,
-        photoUrl: newPlacePhotoUrl
+        image: newPlaceimage
       };
       const data = await api("/places", { method: "POST", body: placeData });
       setDistricts((prev) => {
@@ -76,7 +77,7 @@ export default function AdminDashboard() {
         );
       });
       setNewPlace({ district: "", name: "", description: "" });
-      setNewPlacePhotoUrl("");
+      setNewPlaceimage("");
     } catch (err) {
       console.error(err);
     }
@@ -232,8 +233,8 @@ export default function AdminDashboard() {
                 </label>
                 <input
                   type="url"
-                  value={newDistrictPhotoUrl}
-                  onChange={(e) => setNewDistrictPhotoUrl(e.target.value)}
+                  value={newDistrictimage}
+                  onChange={(e) => setNewDistrictimage(e.target.value)}
                   placeholder="https://example.com/image.jpg"
                   className="w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
@@ -293,8 +294,8 @@ export default function AdminDashboard() {
                 </label>
                 <input
                   type="url"
-                  value={newPlacePhotoUrl}
-                  onChange={(e) => setNewPlacePhotoUrl(e.target.value)}
+                  value={newPlaceimage}
+                  onChange={(e) => setNewPlaceimage(e.target.value)}
                   placeholder="https://example.com/image.jpg"
                   className="w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
@@ -339,7 +340,7 @@ export default function AdminDashboard() {
                 <div key={d._id} className="overflow-hidden transition-shadow duration-200 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md">
                   <div className="bg-gray-200 aspect-w-16 aspect-h-9">
                     <img
-                      src={d.photoUrl || images[d.name] || ""}
+                      src={d.image || images[d.name] || ""}
                       alt={d.name}
                       className="object-cover w-full h-48"
                     />
@@ -358,9 +359,9 @@ export default function AdminDashboard() {
                           placeholder="District name"
                         />
                         <textarea
-                          value={editingData.blurb}
+                          value={editingData.description}
                           onChange={(e) =>
-                            setEditingData({ ...editingData, blurb: e.target.value })
+                            setEditingData({ ...editingData, description: e.target.value })
                           }
                           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           placeholder="Description"
@@ -368,9 +369,9 @@ export default function AdminDashboard() {
                         />
                         <input
                           type="url"
-                          value={editingData.photoUrl}
+                          value={editingData.image}
                           onChange={(e) =>
-                            setEditingData({ ...editingData, photoUrl: e.target.value })
+                            setEditingData({ ...editingData, image: e.target.value })
                           }
                           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           placeholder="Photo URL"
@@ -395,14 +396,14 @@ export default function AdminDashboard() {
                         <div className="flex items-start justify-between mb-3">
                           <div>
                             <h3 className="text-lg font-medium text-gray-900">{d.name}</h3>
-                            {d.blurb && <p className="mt-1 text-sm text-gray-600">{d.blurb}</p>}
+                            {d.description && <p className="mt-1 text-sm text-gray-600">{d.description}</p>}
                           </div>
                           <div className="flex space-x-2">
                             <button
                               className="p-1 text-gray-400 hover:text-blue-600"
                               onClick={() => {
                                 setEditingDistrictId(d._id);
-                                setEditingData({ name: d.name, blurb: d.blurb || "", photoUrl: d.photoUrl || "" });
+                                setEditingData({ name: d.name, description: d.description || "", image: d.image || "" });
                               }}
                             >
                               <Edit3 size={16} />
@@ -446,9 +447,9 @@ export default function AdminDashboard() {
                                       />
                                       <input
                                         type="url"
-                                        value={editingPlaceData.photoUrl}
+                                        value={editingPlaceData.image}
                                         onChange={(e) =>
-                                          setEditingPlaceData({ ...editingPlaceData, photoUrl: e.target.value })
+                                          setEditingPlaceData({ ...editingPlaceData, image: e.target.value })
                                         }
                                         className="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                                         placeholder="Photo URL"
@@ -473,9 +474,9 @@ export default function AdminDashboard() {
                                       <div className="flex-1">
                                         <p className="text-sm font-medium text-gray-900">{place.name}</p>
                                         <p className="mt-1 text-xs text-gray-600">{place.description}</p>
-                                        {place.photoUrl && (
+                                        {place.image && (
                                           <img 
-                                            src={place.photoUrl} 
+                                            src={place.image} 
                                             alt={place.name}
                                             className="object-cover w-16 h-12 mt-2 rounded"
                                           />
@@ -489,7 +490,7 @@ export default function AdminDashboard() {
                                             setEditingPlaceData({ 
                                               name: place.name, 
                                               description: place.description, 
-                                              photoUrl: place.photoUrl || "" 
+                                              image: place.image || "" 
                                             });
                                           }}
                                         >

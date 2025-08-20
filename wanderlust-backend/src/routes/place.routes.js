@@ -7,8 +7,8 @@ const router = Router();
 
 // Create a place
 router.post("/", requireAuth, async (req, res) => {
-  const { district, name, description } = req.body;
-  const place = new Place({ district, name, description });
+  const { district, name, description, image } = req.body;
+  const place = new Place({ district, name, description, image });
   await place.save();
   res.status(201).json(place);
 });
@@ -18,5 +18,24 @@ router.get("/:discrictId", async (req, res) => {
     const places = await Place.find({ district: discrictId })
     res.status(200).json(places)
 })
+
+router.patch("/:id", requireAuth, async (req, res) => {
+  const { id } = req.params;
+  const updates = req.body;
+  const place = await Place.findByIdAndUpdate(id, updates, { new: true });
+  if (!place) {
+    return res.status(404).json({ error: "Place not found" });
+  }
+  res.status(200).json(place);
+});
+
+router.delete("/:id", requireAuth, async (req, res) => {
+  const { id } = req.params;
+  const place = await Place.findByIdAndDelete(id);
+  if (!place) {
+    return res.status(404).json({ error: "Place not found" });
+  }
+  res.status(200).json({ message: "Place deleted successfully" });
+});
 
 export default router;
