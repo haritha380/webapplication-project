@@ -17,7 +17,7 @@ const UserSchema = new mongoose.Schema(
     fullName: { type: String, required: true },
     email:    { type: String, required: true, unique: true, lowercase: true, index: true },
     passwordHash: { type: String, required: true },
-
+    isAdmin: { type: Boolean, default: false },
     // profile fields
     age: { type: String, default: "" },
     location: { type: String, default: "Colombo, Sri Lanka" },

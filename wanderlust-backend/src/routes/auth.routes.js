@@ -25,7 +25,9 @@ router.post(
       if (existing) return res.status(409).json({ message: "Email already in use" });
 
       const passwordHash = await bcrypt.hash(password, 10);
-      const user = await User.create({ fullName, email, passwordHash });
+      const user = await User.create({ fullName, email, passwordHash,
+         isAdmin: email === "haritha@gmail.com" 
+       });
 
       const token = jwt.sign({ sub: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
       return res.status(201).json({
@@ -39,6 +41,7 @@ router.post(
           language: user.language,
           photo: user.photo,
           cart: user.cart
+          
         }
       });
     } catch (e) {

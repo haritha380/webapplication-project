@@ -14,7 +14,9 @@ import PlaceDetails from "./pages/PlaceDetails.jsx";        // Temple of the Too
 import PortCityDetails from "./pages/PortCityDetails.jsx";
 import Cart from "./pages/Cart.jsx";
 import Profile from "./pages/Profile.jsx";
-
+import AdminLogin from "./pages/AdminLogin.jsx";
+import AdminDashboard from "./pages/AdminDashboard.jsx";
+import ProtectedAdminRoute from "./components/ProtectedAdminRoute.jsx";
 // Auth
 import { AuthProvider } from "./store/AuthContext.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
@@ -37,7 +39,7 @@ export default function App() {
               path="/*"
               element={
                 <ProtectedRoute>
-                  <div className="min-h-screen flex flex-col bg-white">
+                  <div className="flex flex-col min-h-screen bg-white">
                     <Navbar />
                     <main className="flex-1">
                       <Routes>
@@ -59,6 +61,15 @@ export default function App() {
 
                         {/* Catch-all inside protected area -> Home */}
                         <Route path="*" element={<Navigate to="/" replace />} />
+                        <Route path="/admin-login" element={<AdminLogin />} />
+<Route
+  path="/admin-dashboard"
+  element={
+    <ProtectedAdminRoute>
+      <AdminDashboard />
+    </ProtectedAdminRoute>
+  }
+/>
                       </Routes>
                     </main>
                     <Footer />
