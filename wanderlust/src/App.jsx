@@ -33,7 +33,8 @@ export default function App() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-
+             <Route path="/admin-login" element={<AdminLogin />} /> {/* Add this route */}
+             <Route path="/admin-dashboard" element={<AdminDashboard />} />  {/* Admin Dashboard Route */}
             {/* Protected app shell: navbar + footer + all private pages */}
             <Route
               path="/*"

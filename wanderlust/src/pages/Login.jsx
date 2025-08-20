@@ -33,8 +33,8 @@ export default function Login() {
         }}
       >
         <div className="absolute inset-0 bg-black/55" />
-        <div className="absolute top-12 left-10 right-10 text-white">
-          <h1 className="font-serif font-black text-5xl leading-tight">
+        <div className="absolute text-white top-12 left-10 right-10">
+          <h1 className="font-serif text-5xl font-black leading-tight">
             Discover Sri Lanka
           </h1>
           <h3 className="mt-5 text-3xl">
@@ -49,29 +49,29 @@ export default function Login() {
       {/* Right form section */}
       <div className="bg-[#f5eef5] flex items-center justify-center py-16">
         <div className="w-full max-w-xl px-8">
-          <h2 className="text-4xl font-serif font-bold text-center">
+          <h2 className="font-serif text-4xl font-bold text-center">
             Welcome Back!
           </h2>
-          <p className="text-center text-lg mt-3">
+          <p className="mt-3 text-lg text-center">
             Log in to continue your journey
           </p>
 
           <form onSubmit={handleLogin} className="mt-10 space-y-6">
             <div>
-              <label className="block font-medium mb-2">Email</label>
+              <label className="block mb-2 font-medium">Email</label>
               <input
                 className="input"
-                name="email"                // <-- IMPORTANT
+                name="email" // <-- IMPORTANT
                 type="email"
                 placeholder="you@example.com"
                 required
               />
             </div>
             <div>
-              <label className="block font-medium mb-2">Password</label>
+              <label className="block mb-2 font-medium">Password</label>
               <input
                 className="input"
-                name="password"             // <-- IMPORTANT
+                name="password" // <-- IMPORTANT
                 type="password"
                 placeholder="••••••••"
                 required
@@ -84,7 +84,7 @@ export default function Login() {
               </button>
             </div>
 
-            <button type="submit" className="btn-primary w-full">
+            <button type="submit" className="w-full btn-primary">
               Login
             </button>
 
@@ -94,6 +94,13 @@ export default function Login() {
                 Sign Up
               </Link>
             </p>
+
+            {/* Admin Login Link */}
+            <div className="mt-4 text-center">
+              <Link className="text-blue-700 underline" to="/admin-login">
+                Admin Login
+              </Link>
+            </div>
           </form>
         </div>
       </div>
