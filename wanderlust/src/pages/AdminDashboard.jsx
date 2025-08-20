@@ -7,14 +7,19 @@ import GALLE_IMG from "../assets/galle.webp";
 import NUWARA_IMG from "../assets/nuwaraeliya.jpg";
 import JAFFNA_IMG from "../assets/jaffna.jpg";
 import ANURADHAPURA_IMG from "../assets/anuradhapura.jpg";
-import { Compass } from "lucide-react"; // Import Compass icon
+import { Compass, Trash2, Edit3 } from "lucide-react"; // Import icons
 
 export default function AdminDashboard() {
   const [districts, setDistricts] = useState([]);
   const [newDistrict, setNewDistrict] = useState("");
+  const [newDistrictDescription, setNewDistrictDescription] = useState(""); // New state for district description
+  const [newDistrictPhotoUrl, setNewDistrictPhotoUrl] = useState(""); // New state for district photo URL
   const [newPlace, setNewPlace] = useState({ district: "", name: "", description: "" });
+  const [newPlacePhotoUrl, setNewPlacePhotoUrl] = useState(""); // New state for place photo URL
   const [editingDistrictId, setEditingDistrictId] = useState(null);
-  const [editingData, setEditingData] = useState({ name: "", blurb: "" });
+  const [editingData, setEditingData] = useState({ name: "", blurb: "", photoUrl: "" });
+  const [editingPlaceId, setEditingPlaceId] = useState(null); // New state for editing places
+  const [editingPlaceData, setEditingPlaceData] = useState({ name: "", description: "", photoUrl: "" }); // New state for place editing
 
   const images = {
     Kandy: KANDY_IMG,
@@ -34,33 +39,50 @@ export default function AdminDashboard() {
     fetchDistricts();
   }, []);
 
+  // Enhanced handleAddDistrict with description and photo URL
   async function handleAddDistrict() {
     try {
-      const data = await api("/districts", { method: "POST", body: { name: newDistrict, blurb: "" } });
+      const data = await api("/districts", { 
+        method: "POST", 
+        body: { 
+          name: newDistrict, 
+          blurb: newDistrictDescription,
+          photoUrl: newDistrictPhotoUrl
+        } 
+      });
       setDistricts((prev) => [...prev, data]);
       setNewDistrict("");
+      setNewDistrictDescription("");
+      setNewDistrictPhotoUrl("");
     } catch (err) {
       console.error(err);
     }
   }
 
+  // Enhanced handleAddPlace with photo URL
   async function handleAddPlace() {
     try {
-        const {description, district, name} = newPlace
-      const data = await api("/places", { method: "POST", body: newPlace });
+      const {description, district, name} = newPlace;
+      const placeData = {
+        ...newPlace,
+        photoUrl: newPlacePhotoUrl
+      };
+      const data = await api("/places", { method: "POST", body: placeData });
       setDistricts((prev) => {
-        return prev.map((district) =>
-          district.name === newPlace.district
-            ? { ...district, places: [...(district.places || []), data] }
-            : district
+        return prev.map((districtItem) =>
+          districtItem._id === newPlace.district
+            ? { ...districtItem, places: [...(districtItem.places || []), data] }
+            : districtItem
         );
       });
       setNewPlace({ district: "", name: "", description: "" });
+      setNewPlacePhotoUrl("");
     } catch (err) {
       console.error(err);
     }
   }
 
+  // Enhanced handleSaveEdit with photo URL
   async function handleSaveEdit(districtId) {
     try {
       const updatedDistrict = await api(`/districts/${districtId}`, {
@@ -76,11 +98,62 @@ export default function AdminDashboard() {
     }
   }
 
+  // New function to delete district
+  async function handleDeleteDistrict(districtId) {
+    if (window.confirm("Are you sure you want to delete this district? This will also delete all places in this district.")) {
+      try {
+        await api(`/districts/${districtId}`, { method: "DELETE" });
+        setDistricts((prev) => prev.filter((d) => d._id !== districtId));
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  }
+
+  // New function to save place edit
+  async function handleSavePlaceEdit(placeId) {
+    try {
+      const updatedPlace = await api(`/places/${placeId}`, {
+        method: "PATCH",
+        body: editingPlaceData
+      });
+      setDistricts((prev) =>
+        prev.map((district) => ({
+          ...district,
+          places: district.places?.map((place) =>
+            place._id === placeId ? updatedPlace : place
+          ) || []
+        }))
+      );
+      setEditingPlaceId(null);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  // New function to delete place
+  async function handleDeletePlace(placeId, districtId) {
+    if (window.confirm("Are you sure you want to delete this place?")) {
+      try {
+        await api(`/places/${placeId}`, { method: "DELETE" });
+        setDistricts((prev) =>
+          prev.map((district) => 
+            district._id === districtId
+              ? { ...district, places: district.places?.filter((place) => place._id !== placeId) || [] }
+              : district
+          )
+        );
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  }
+
   return (
     <div className="relative min-h-screen bg-gray-50">
       {/* Background Image */}
       <div 
-        className="fixed inset-0 z-0 bg-center bg-no-repeat bg-cover opacity-900"
+        className="fixed inset-0 z-0 bg-center bg-no-repeat bg-cover opacity-10"
         style={{
           backgroundImage: `url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')`
         }}
@@ -98,14 +171,13 @@ export default function AdminDashboard() {
             </Link>
 
             <div className="flex items-center justify-center text-gray-600">
-  <div className="text-3xl font-medium">
-    Admin Dashboard
-  </div>
-  <div className="ml-2 text-lg">
-    — Manage districts and places
-  </div>
-</div>
-
+              <div className="text-3xl font-medium">
+                Admin Dashboard
+              </div>
+              <div className="ml-2 text-lg">
+                — Manage districts and places
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -113,7 +185,7 @@ export default function AdminDashboard() {
       <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
         {/* Action Cards */}
         <div className="grid gap-6 mb-8 md:grid-cols-2">
-          {/* Add District Card */}
+          {/* Add District Card - Enhanced */}
           <div className="p-6 border border-gray-200 rounded-lg shadow-sm bg-white/90 backdrop-blur-sm">
             <div className="flex items-center mb-4">
               <div className="flex items-center justify-center w-10 h-10 mr-3 bg-blue-100 rounded-full">
@@ -138,6 +210,35 @@ export default function AdminDashboard() {
                   className="w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
+              
+              {/* New Description Field */}
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-700">
+                  Description
+                </label>
+                <textarea
+                  value={newDistrictDescription}
+                  onChange={(e) => setNewDistrictDescription(e.target.value)}
+                  placeholder="Enter district description"
+                  rows="3"
+                  className="w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              
+              {/* New Photo URL Field */}
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-700">
+                  Photo URL
+                </label>
+                <input
+                  type="url"
+                  value={newDistrictPhotoUrl}
+                  onChange={(e) => setNewDistrictPhotoUrl(e.target.value)}
+                  placeholder="https://example.com/image.jpg"
+                  className="w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              
               <button 
                 onClick={handleAddDistrict} 
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
@@ -147,7 +248,7 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          {/* Add Place Card */}
+          {/* Add Place Card - Enhanced */}
           <div className="p-6 border border-gray-200 rounded-lg shadow-sm bg-white/90 backdrop-blur-sm">
             <div className="flex items-center mb-4">
               <div className="flex items-center justify-center w-10 h-10 mr-3 bg-green-100 rounded-full">
@@ -176,11 +277,25 @@ export default function AdminDashboard() {
                 <label className="block mb-2 text-sm font-medium text-gray-700">
                   Description
                 </label>
-                <input
-                  type="text"
+                <textarea
                   value={newPlace.description}
                   onChange={(e) => setNewPlace({ ...newPlace, description: e.target.value })}
-                  placeholder="Enter description"
+                  placeholder="Enter place description"
+                  rows="2"
+                  className="w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              
+              {/* New Photo URL Field for Places */}
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-700">
+                  Photo URL
+                </label>
+                <input
+                  type="url"
+                  value={newPlacePhotoUrl}
+                  onChange={(e) => setNewPlacePhotoUrl(e.target.value)}
+                  placeholder="https://example.com/image.jpg"
                   className="w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
@@ -190,7 +305,7 @@ export default function AdminDashboard() {
                   District
                 </label>
                 <select
-                  value={newPlace.district._id}
+                  value={newPlace.district}
                   onChange={(e) => setNewPlace({ ...newPlace, district: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
@@ -211,7 +326,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Districts Section */}
+        {/* Districts Section - Enhanced */}
         <div className="overflow-hidden border border-gray-200 rounded-lg shadow-sm bg-white/90 backdrop-blur-sm">
           <div className="px-6 py-4 border-b border-gray-200 bg-gray-50/90 backdrop-blur-sm">
             <h3 className="text-xl font-medium text-gray-900">Districts ({districts.length})</h3>
@@ -224,7 +339,7 @@ export default function AdminDashboard() {
                 <div key={d._id} className="overflow-hidden transition-shadow duration-200 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md">
                   <div className="bg-gray-200 aspect-w-16 aspect-h-9">
                     <img
-                      src={images[d.name] || ""}
+                      src={d.photoUrl || images[d.name] || ""}
                       alt={d.name}
                       className="object-cover w-full h-48"
                     />
@@ -242,14 +357,23 @@ export default function AdminDashboard() {
                           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           placeholder="District name"
                         />
-                        <input
-                          type="text"
+                        <textarea
                           value={editingData.blurb}
                           onChange={(e) =>
                             setEditingData({ ...editingData, blurb: e.target.value })
                           }
                           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           placeholder="Description"
+                          rows="2"
+                        />
+                        <input
+                          type="url"
+                          value={editingData.photoUrl}
+                          onChange={(e) =>
+                            setEditingData({ ...editingData, photoUrl: e.target.value })
+                          }
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Photo URL"
                         />
                         <div className="flex space-x-2">
                           <button
@@ -273,6 +397,23 @@ export default function AdminDashboard() {
                             <h3 className="text-lg font-medium text-gray-900">{d.name}</h3>
                             {d.blurb && <p className="mt-1 text-sm text-gray-600">{d.blurb}</p>}
                           </div>
+                          <div className="flex space-x-2">
+                            <button
+                              className="p-1 text-gray-400 hover:text-blue-600"
+                              onClick={() => {
+                                setEditingDistrictId(d._id);
+                                setEditingData({ name: d.name, blurb: d.blurb || "", photoUrl: d.photoUrl || "" });
+                              }}
+                            >
+                              <Edit3 size={16} />
+                            </button>
+                            <button
+                              className="p-1 text-gray-400 hover:text-red-600"
+                              onClick={() => handleDeleteDistrict(d._id)}
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
                         </div>
 
                         {d.places && d.places.length > 0 && (
@@ -282,9 +423,87 @@ export default function AdminDashboard() {
                             </h4>
                             <div className="space-y-2">
                               {d.places.map((place) => (
-                                <div key={place._id} className="p-3 rounded-md bg-gray-50">
-                                  <p className="text-sm font-medium text-gray-900">{place.name}</p>
-                                  <p className="mt-1 text-xs text-gray-600">{place.description}</p>
+                                <div key={place._id}>
+                                  {editingPlaceId === place._id ? (
+                                    <div className="p-3 space-y-2 rounded-md bg-gray-50">
+                                      <input
+                                        type="text"
+                                        value={editingPlaceData.name}
+                                        onChange={(e) =>
+                                          setEditingPlaceData({ ...editingPlaceData, name: e.target.value })
+                                        }
+                                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        placeholder="Place name"
+                                      />
+                                      <textarea
+                                        value={editingPlaceData.description}
+                                        onChange={(e) =>
+                                          setEditingPlaceData({ ...editingPlaceData, description: e.target.value })
+                                        }
+                                        className="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        placeholder="Description"
+                                        rows="2"
+                                      />
+                                      <input
+                                        type="url"
+                                        value={editingPlaceData.photoUrl}
+                                        onChange={(e) =>
+                                          setEditingPlaceData({ ...editingPlaceData, photoUrl: e.target.value })
+                                        }
+                                        className="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        placeholder="Photo URL"
+                                      />
+                                      <div className="flex space-x-2">
+                                        <button
+                                          className="px-3 py-1 text-xs font-medium text-white bg-green-600 rounded hover:bg-green-700"
+                                          onClick={() => handleSavePlaceEdit(place._id)}
+                                        >
+                                          Save
+                                        </button>
+                                        <button
+                                          className="px-3 py-1 text-xs font-medium text-gray-700 bg-gray-200 rounded hover:bg-gray-300"
+                                          onClick={() => setEditingPlaceId(null)}
+                                        >
+                                          Cancel
+                                        </button>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div className="flex items-center justify-between p-3 rounded-md bg-gray-50">
+                                      <div className="flex-1">
+                                        <p className="text-sm font-medium text-gray-900">{place.name}</p>
+                                        <p className="mt-1 text-xs text-gray-600">{place.description}</p>
+                                        {place.photoUrl && (
+                                          <img 
+                                            src={place.photoUrl} 
+                                            alt={place.name}
+                                            className="object-cover w-16 h-12 mt-2 rounded"
+                                          />
+                                        )}
+                                      </div>
+                                      <div className="flex ml-2 space-x-1">
+                                        <button
+                                          className="p-1 text-gray-400 hover:text-blue-600"
+                                          onClick={() => {
+                                            setEditingPlaceId(place._id);
+                                            setEditingPlaceData({ 
+                                              name: place.name, 
+                                              description: place.description, 
+                                              photoUrl: place.photoUrl || "" 
+                                            });
+                                          }}
+                                        >
+                                          <Edit3 size={12} />
+                                        </button>
+                                        <button
+                                          className="p-1 text-gray-400 hover:text-red-600"
+                                          onClick={() => handleDeletePlace(place._id, d._id)}
+                                        >
+                                          <Trash2 size={12} />
+                                        </button>
+                                      </div>
+                                    </div>
+                                  )}
                                 </div>
                               ))}
                             </div>
