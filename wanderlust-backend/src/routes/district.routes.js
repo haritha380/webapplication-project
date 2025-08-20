@@ -19,4 +19,10 @@ router.get("/", requireAuth, async (req, res) => {
   res.json(districts);
 });
 
+router.get("/:districtId", async (req, res) => {
+  const { districtId } = req.params;
+  const district = await District.findById(districtId);
+  res.json(district)
+});
+
 export default router;

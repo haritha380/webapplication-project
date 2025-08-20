@@ -13,4 +13,10 @@ router.post("/", requireAuth, async (req, res) => {
   res.status(201).json(place);
 });
 
+router.get("/:discrictId", async (req, res) => {
+    const discrictId = req.params.discrictId;
+    const places = await Place.find({ district: discrictId })
+    res.status(200).json(places)
+})
+
 export default router;

@@ -49,8 +49,9 @@ export default function App() {
 
                         {/* District selector + district pages */}
                         <Route path="/districts" element={<Districts />} />
-                        <Route path="/districts/kandy" element={<District />} />
-                        <Route path="/districts/colombo" element={<Colombo />} />
+                        {/* <Route path="/districts/kandy" element={<District />} />
+                        <Route path="/districts/colombo" element={<Colombo />} /> */}
+                        <Route path="/districts/:districtId" element={<District />} />
 
                         {/* Place details */}
                         <Route path="/places/temple-of-the-tooth" element={<PlaceDetails />} />
