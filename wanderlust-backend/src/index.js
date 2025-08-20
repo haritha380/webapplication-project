@@ -9,6 +9,8 @@ import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import cartRoutes from "./routes/cart.routes.js";
 import bookingRoutes from "./routes/bookings.routes.js"; // <-- add
+import discrictRotuer from "./routes/district.routes.js"; // <-- add
+import placesRouter from "./routes/place.routes.js"
 
 const app = express();
 
@@ -25,6 +27,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api", userRoutes);          // /api/me
 app.use("/api/cart", cartRoutes);
 app.use("/api/bookings", bookingRoutes); // <-- add
+app.use("/api/districts", discrictRotuer)
+app.use("/api/places", placesRouter)
 
 const port = process.env.PORT || 5000;
 
