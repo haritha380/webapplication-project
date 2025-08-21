@@ -2,7 +2,8 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { Compass, MapPin, User2, ShoppingCart, LogOut } from "lucide-react";
 import { useUser } from "../store/UserContext";
 import { useAuth } from "../store/AuthContext";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { api } from "../lib/api";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -15,6 +16,18 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState("");
   const [error, setError] = useState("");
 
+   const [districts, setDistricts] = useState([]); 
+  
+  useEffect(() => {
+    const refresh = async () => {
+      const dist = await api("/districts")
+      setDistricts(dist)
+      // console.log(dist)
+    }
+    // setInterval(refresh, 5000)
+    refresh()
+  }, [])
+
   const onLogout = () => {
     try { logout?.(); } catch {}
     try { clearUser(); } catch {}
@@ -24,23 +37,25 @@ export default function Navbar() {
   const handleSearch = (e) => {
     if (e.key === "Enter") {
       const query = searchQuery.trim().toLowerCase();
-      if (query === "kandy") {
-        navigate("/districts/kandy");
+      console.log(query, districts)
+      const res = districts.findIndex(e=>e.name.trim().toLowerCase()==query)
+      console.log(res)
+      if (res != -1) {
+        const id = districts[res]._id
         setError("");
-      } else if (query === "colombo") {
-        navigate("/districts/colombo");
-        setError("");
-      } else {
+         navigate(`/districts/${id}`,);
+      }
+      else {
         setError("Not available for now, try later.");
       }
     }
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-gray-200">
-      <div className="container-xxl h-16 flex items-center justify-between gap-4">
+    <header className="sticky top-0 z-40 border-b border-gray-200 bg-white/95 backdrop-blur">
+      <div className="flex items-center justify-between h-16 gap-4 container-xxl">
         <Link to="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-brand-600 grid place-content-center text-white">
+          <div className="grid w-8 h-8 text-white rounded-full bg-brand-600 place-content-center">
             <Compass size={18} />
           </div>
           <span className="font-semibold tracking-wide">
@@ -48,16 +63,16 @@ export default function Navbar() {
           </span>
         </Link>
 
-        <div className="hidden md:flex flex-1 max-w-xl relative">
+        <div className="relative flex-1 hidden max-w-xl md:flex">
           <input
-            className="w-full rounded-full bg-gray-100 px-4 py-2 outline-none border border-transparent focus:border-brand-400"
+            className="w-full px-4 py-2 bg-gray-100 border border-transparent rounded-full outline-none focus:border-brand-400"
             placeholder="Search destinations, activities, or guides…"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={handleSearch}
           />
           {error && (
-            <div className="absolute top-full left-0 mt-1 text-red-500 text-sm">
+            <div className="absolute left-0 mt-1 text-sm text-red-500 top-full">
               {error}
             </div>
           )}
@@ -79,7 +94,7 @@ export default function Navbar() {
               <ShoppingCart size={18}/> Cart
             </span>
           </NavLink>
-          <button onClick={onLogout} className="text-gray-600 hover:text-gray-900 inline-flex items-center gap-2">
+          <button onClick={onLogout} className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900">
             <LogOut size={18}/> Logout
           </button>
         </nav>

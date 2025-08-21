@@ -86,7 +86,7 @@ useEffect(() => {
             <div key={d._id} className="overflow-hidden card shadow-soft group">
               <div className="w-full h-48 overflow-hidden">
                 <img
-                  src={d.img}
+                  src={d.image}
                   alt={d.name}
                   className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
                 />
